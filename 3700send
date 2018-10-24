@@ -56,13 +56,28 @@ def send_packets():
             return True
 
 def resend_packets(seq):
-    global SEQUENCE
+    log("HERE")
     for sequence, message in PACKETS.items():
         if sequence > seq:
+            log("HERE2")
             if sock.sendto(message, dest) < len(message):
                 log("[error] unable to fully send packet")
             else:
-                log("[send data] " + str(SEQUENCE) + " (" + str(len(data)) + ")")
+                pass
+                # log("[send data] " + str(sequence) + " (" + str(len(message['data'])) + ")")
+
+    # sequence = seq
+    # while True:
+    #     message = PACKETS[sequence]
+    #     if (sequence + len(message[data])) in PACKETS.keys():
+    #         if sock.sendto(message, dest) < len(message):
+    #             log("[error] unable to fully send packet")
+    #         else:
+    #             log("[send data] " + str(sequence) + " (" + str(len(message['data'])) + ")")
+    #     else:
+    #         sequence += len(message[data])
+
+
 
 
 
@@ -100,7 +115,7 @@ while True:
                 break
 
         except (ValueError, KeyError, TypeError) as e:
-            log("[recv corrupt packet]")
+            log("[send corrupt packet]")
 
     else:
         log("[error] timeout")
