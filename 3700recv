@@ -16,6 +16,7 @@ def log(string):
 MSG_SIZE = 1500
 TIMEOUT = 30
 ACK = -1
+REJ_ACK = -1
 PACKETS = {-1: "0"}
 
 # Bind to localhost and an ephemeral port
@@ -65,11 +66,15 @@ while True:
             ACK = i
             i+= len(PACKETS[i])
 
+          ## send only the last ack
+              # in sender delete from packets everything that was before that SEQ
 
         else:
           log("[recv data] " + str(decoded['sequence']) + " (" + str(len(decoded['data'])) + ") REJECTED (out-of-order)")
           # Send back an ack to the sender
+          # if REJ_ACK != ACK:
           msg = json.dumps({"ack": ACK})
+            # REJ_ACK = ACK
           log("ABOUT TO SEND " + msg)
 
 
@@ -84,3 +89,34 @@ while True:
   else:
     log("[error] timeout")
     sys.exit(-1)
+    # worse resuZZlts
+    # if ACK + len(PACKETS[ACK]) == decoded['sequence']:
+    #   ACK = decoded['sequence']
+    #   log("[recv data] " + str(decoded['sequence']) + " (" + str(len(decoded['data'])) + ") ACCEPTED (in-order)")
+    #   sys.stdout.write(decoded['data'])
+    #   # msg = json.dumps({"ack": ACK})
+    #   # log("ABOUT TO SEND " + msg)
+    #   j = ACK
+    #   i = j + len(decoded['data'])
+    #   while i in PACKETS.keys():
+    #     sys.stdout.write(PACKETS[i])
+    #     # msg = json.dumps({"ack": i})
+    #     j = i
+    #     i += len(PACKETS[i])
+    #
+    #   ACK = j
+    #   msg = json.dumps({"ack": ACK})
+
+
+    # if ACK + len(PACKETS[ACK]) == decoded['sequence']:
+    #   ACK = decoded['sequence']
+    #   log("[recv data] " + str(decoded['sequence']) + " (" + str(len(decoded['data'])) + ") ACCEPTED (in-order)")
+    #   sys.stdout.write(decoded['data'])
+    #   msg = json.dumps({"ack": ACK})
+    #   # log("ABOUT TO SEND " + msg)
+    #   i = ACK + len(decoded['data'])
+    #   while i in PACKETS.keys():
+    #     sys.stdout.write(PACKETS[i])
+    #     msg = json.dumps({"ack": i})
+    #     ACK = i
+    #     i += len(PACKETS[i])

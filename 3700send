@@ -55,6 +55,19 @@ def send_packets():
         else:
             return True
 
+# def resend_packets(seq):
+#     min = PACKETS.keys()[0]
+#     for sequence, m in PACKETS.items():
+#         if sequence < min:
+#             min = sequence
+#     message = PACKETS[min]
+#     log("MIN KEY " + str(min))
+#     if sock.sendto(message, dest) < len(message):
+#         log("[error] unable to fully send packet")
+#     else:
+#         pass
+#     PACKETS.pop(min)
+
 def resend_packets(seq):
     log("HERE")
     for sequence, message in PACKETS.items():
@@ -65,20 +78,6 @@ def resend_packets(seq):
             else:
                 pass
                 # log("[send data] " + str(sequence) + " (" + str(len(message['data'])) + ")")
-
-    # sequence = seq
-    # while True:
-    #     message = PACKETS[sequence]
-    #     if (sequence + len(message[data])) in PACKETS.keys():
-    #         if sock.sendto(message, dest) < len(message):
-    #             log("[error] unable to fully send packet")
-    #         else:
-    #             log("[send data] " + str(sequence) + " (" + str(len(message['data'])) + ")")
-    #     else:
-    #         sequence += len(message[data])
-
-
-
 
 
 
@@ -100,10 +99,15 @@ while True:
             # If there is an ack, send next packet
             if decoded['ack'] in PACKETS.keys():
                 log("before" + str(len(PACKETS)))
-                PACKETS.pop(decoded['ack'])
+                for sequence, message in PACKETS.items():
+                    if (sequence <= decoded['ack']):
+                        PACKETS.pop(sequence)
                 log("after" + str(len(PACKETS)))
 
                 log("[recv ack] " + str(decoded['ack']))
+                for key, value in PACKETS.items():
+                    log(str(key))
+
                 # Try to send next packet; break if no more data
                 # if (not send_packets()):
                 #     break
@@ -121,5 +125,6 @@ while True:
         log("[error] timeout")
         sys.exit(-1)
 
-sock.sendto(json.dumps({"eof": True, "data": "", "sequence": SEQUENCE}), dest)
+for i in range(10):
+    sock.sendto(json.dumps({"eof": True, "data": "", "sequence": SEQUENCE}), dest)
 sys.exit(0)
